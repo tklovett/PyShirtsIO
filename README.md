@@ -1,6 +1,6 @@
 # PyShirtsIO
 
-[![Build Status](https://travis-ci.org/tumblr/pytumblr.png?branch=master)](https://travis-ci.org/tumblr/pytumblr)
+[![Build Status](https://travis-ci.org/tklovett/PyShirtsIO.png?branch=master)](https://travis-ci.org/tklovett/PyShirtsIO)
 
 ## Create a client
 
@@ -43,11 +43,11 @@ The tests (and coverage reports) are run with nose, like this:
 python setup.py test
 ```
 
-# Copyright and license
+# Copyright and License
 
 This is a derivative work of [PyTumblr](https://github.com/tumblr/pytumblr/)
-under the Apache [License](https://github.com/tumblr/pytumblr/blob/master/LICENSE).
-Any code in this source left unmodified is Copyright 2013 Tumblr, Inc.
+under its Apache [License](https://github.com/tumblr/pytumblr/blob/master/LICENSE).
+Any code in this source left unmodified from PyTumblr is Copyright 2013 Tumblr, Inc.
 
 This work is licensed under the The MIT License (MIT).
 
