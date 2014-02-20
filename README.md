@@ -16,12 +16,16 @@ client.product_categories() # returns a list of available product categories
 ## Supported Methods
 
 ``` python
-client.categories() # get the list of available product categories
-client.products()
-client.quote()
-client.order()
-client.status()
-
+client.products.categories()    # get a list of product categories
+client.products.categories(3)   # get a list of products in category 3
+client.products(5)              # get details for product 5
+client.products(5, inventory_info=True, state='PA')              # get details for product 5 including inventory in PA
+client.quote(order)             # get a quote for the specified order
+client.order.create(order)      # place the specified order
+client.status(2)                # get the status of order 2
+client.webhooks.list()          # list the registered webhooks
+client.webhooks.create(URL)     # add the webhook URL
+client.webhooks.delete(URL)     # delete the webhook URL
 ```
 
 ## Using the interactive console
