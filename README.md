@@ -24,8 +24,8 @@ client.quote({})                # get a quote for the specified order
 client.order.create({})         # place the specified order
 client.status(2)                # get the status of order 2
 client.webhooks()               # ger a list of registered webhooks
-client.webhooks.create("")     # add the specified webhook URL
-client.webhooks.delete("")     # delete the specified webhook URL
+client.webhooks.create("")      # add the specified webhook URL
+client.webhooks.delete("")      # delete the specified webhook URL
 ```
 
 ## Using the interactive console
