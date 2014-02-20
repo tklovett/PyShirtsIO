@@ -13,7 +13,7 @@ def validate_params(required, optional, params):
 
     missing_fields = [x for x in required if x not in params]
     if missing_fields:
-        field_strings = ",".join(missing_fields)
+        field_strings = ", ".join(missing_fields)
         raise Exception("Missing fields: %s" % field_strings)
 
     disallowed_fields = [x for x in params if x not in optional and x not in required]

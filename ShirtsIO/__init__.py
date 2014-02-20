@@ -17,70 +17,77 @@ class ShirtsIOClient(object):
 
         :returns: None
         """
-        self.request = ShirtsIORequest(api_key)
+        # self.shirtsio_request = ShirtsIORequest(api_key)
+        self.ApiResourceMixin.set_api_key(api_key)
+        self.products = self.ProductsResource()
+        self.quote = self.QuoteResource()
+        self.status = self.StatusResource()
+        self.webhooks = self.WebhooksResource()
 
-    def categories(self, category_id=None):
-        resource_url = 'products/category/'
+    class ApiResourceMixin(object):
 
-        if category_id is not None:
-            resource_url += str(category_id) + '/'
+        @classmethod
+        def set_api_key(cls, key):
+            cls.api_key = key
+            cls.request = ShirtsIORequest(key)
 
-        return self.send_api_request("get", resource_url)
-
-    def products(self, product_id, get_inventory=False, **kwargs):
-        resource_url = 'products/' + str(product_id) + '/'
-        required_params = []
-        optional_params = []
-
-        if get_inventory:
-            required_params = ['color']
-            optional_params = ['state']
-
-        return self.send_api_request("get", resource_url, kwargs, required_params, optional_params)
-
-    def quote(self, **kwargs):
-        resource_url = 'quote/'
-        required_params = ['garment', 'print']
-        optional_params = ['print_type', 'personalization', 'address_count', 'extra_screens', 'ship_type',
-                           'international_garments']
-
-        return self.send_api_request("get", resource_url, kwargs, required_params, optional_params)
-
-    def order(self, **kwargs):
-        resource_url = 'order/'
-        required_params = ['test', 'price', 'garment', 'print', 'addresses']
-        optional_params = ['print_type', 'personalization', 'address_count', 'extra_screens', 'ship_type']
-
-        return self.send_api_request("post", resource_url, kwargs, required_params, optional_params)
-
-    def status(self, order_id):
-        resource_url = 'status/' + str(order_id) + '/'
-        return self.send_api_request('get', resource_url)
-
-    def send_api_request(self, method, url, params={}, required_params=[], optional_params=[]):
-        """
-        Sends the url with parameters to the requested url, validating them
-        to make sure that they are what we expect to have passed to us
-
-        :param method: a string, the request method you want to make
-        :param params: a dict, the parameters used for the API request
-        :param valid_parameters: a list, the list of valid parameters
-        :param needs_api_key: a boolean, whether or not your request needs an api key injected
-
-        :returns: a dict parsed from the JSON response
-        """
-
-        files = []
-        if 'data' in params:
-            if isinstance(params['data'], list):
-                files = [('data[' + str(idx) + ']', data, open(data, 'rb').read()) for idx, data in
-                         enumerate(params['data'])]
-            else:
-                files = [('data', params['data'], open(params['data'], 'rb').read())]
-            del params['data']
-
-        validate_params(required_params, optional_params, params)
-        if method == "get":
+        def get(self, url, params={}):
             return self.request.get(url, params)
-        elif method == "post":
-            return self.request.post(url, params, files)
+
+        def post(self, url, data={}):
+            return self.request.post(url, data)
+
+    class ProductsResource(ApiResourceMixin):
+        endpoint = 'products/'
+
+        def categories(self, category_id=None):
+            if category_id:
+                return self.get(self.endpoint + 'category/' + str(category_id))
+            else:
+                return self.get(self.endpoint + 'category/')
+
+        def __call__(self, product_id, inventory_info=False, **kwargs):
+            if inventory_info:
+                required_params = ['color']
+                optional_params = ['state']
+                validate_params(required_params, optional_params, kwargs)
+                return self.get(self.endpoint + str(product_id), kwargs)
+            else:
+                return self.get(self.endpoint + str(product_id))
+
+    class QuoteResource(ApiResourceMixin):
+        endpoint = 'quote/'
+
+        def __call__(self, params):
+            required_params = ['garment', 'print']
+            optional_params = ['print_type', 'personalization', 'address_count', 'extra_screens', 'ship_type',
+                               'international_garments']
+            validate_params(required_params, optional_params, params)
+            return self.get(self.endpoint, params)
+
+    class OrderResource(ApiResourceMixin):
+        endpoint = 'order/'
+
+        def create(self, **kwargs):
+            required_params = ['test', 'price', 'garment', 'print', 'addresses']
+            optional_params = ['print_type', 'personalization', 'address_count', 'extra_screens', 'ship_type']
+            validate_params(required_params, optional_params, kwargs)
+            return self.post(self.endpoint, kwargs)
+
+    class StatusResource(ApiResourceMixin):
+        endpoint = 'status/'
+
+        def __call__(self, order_id):
+            return self.get(self.endpoint + str(order_id) + '/')
+
+    class WebhooksResource(ApiResourceMixin):
+        endpoint = 'webhooks/'
+
+        def list(self):
+            return self.get(self.endpoint + 'list/')
+
+        def create(self, url):
+            return self.post(self.endpoint + 'register/', {'url': "'%s'" % url})
+
+        def delete(self, url):
+            return self.post(self.endpoint + 'delete/', {'url': "'%s'" % url})

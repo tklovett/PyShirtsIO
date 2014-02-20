@@ -12,7 +12,7 @@ class ShirtsIORequest(object):
         self.host = 'https://www.shirts.io/api/v1/'
         self.api_key = api_key
 
-    def get(self, url, params):
+    def get(self, url, params={}):
         """
         Issues a GET request against the API, properly formatting the params
 
@@ -30,7 +30,7 @@ class ShirtsIORequest(object):
 
         return self.json_parse(response.content)
 
-    def post(self, url, params={}, files=[]):
+    def post(self, url, params={}, files=None):
         """
         Issues a POST request against the API, allows for multipart data uploads
 
@@ -43,7 +43,7 @@ class ShirtsIORequest(object):
         """
         params.update({'api_key': self.api_key})
         try:
-            response = requests.post(self.host + url, params=params, files=files)
+            response = requests.post(self.host + url, data=params, files=files)
             return self.json_parse(response.content)
         except RequestException as e:
             return self.json_parse(e.args)
@@ -60,7 +60,7 @@ class ShirtsIORequest(object):
         try:
             data = json.loads(content)
         except ValueError, e:
-            data = {'meta': { 'status': 500, 'msg': 'Server Error'}, 'response': {"error": "Malformed JSON or HTML was returned."}}
+            return {'meta': { 'status': 500, 'msg': 'Server Error'}, 'response': {"error": "Malformed JSON or HTML was returned."}}
         
         #We only really care about the response if we succeed
         #and the error if we fail
