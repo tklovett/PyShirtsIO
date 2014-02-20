@@ -83,7 +83,7 @@ class ShirtsIOClient(object):
     class WebhooksResource(ApiResourceMixin):
         endpoint = 'webhooks/'
 
-        def list(self):
+        def __call__(self):
             return self.get(self.endpoint + 'list/')
 
         def create(self, url):
